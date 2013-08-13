@@ -38,6 +38,20 @@ describe Fuey::Client do
       Then { expect( result ).to eql(0) }
     end
 
+    context "when one vpn tunnel is configured" do
+      Given { Fuey::Log.stub(:write) }
+      Given { Fuey::Config.test_with(one_vpn) }
+      Given (:mock_snmpwalk) { double Fuey::Inspections::SNMPWalk }
+      Given { Fuey::Inspections::SNMPWalk.should_receive(:new).
+        with(
+             'VPN 1', '71.131.12.15', 'public', "1.2.9.2.5.3.5.7.111.0.2.0.1.0", "v1"
+             ).
+        and_return mock_snmpwalk }
+      Given { mock_snmpwalk.should_receive(:execute).once }
+      When  (:result) { Fuey::Client.new.run }
+      Then  { expect( result ).to eql(0) }
+    end
+
     context "and there is a configuration error" do
       Given { Fuey::Log.should_receive(:write).with("crap") }
       Given { Fuey::Config.stub(:inspections).and_raise(RuntimeError, "crap") }
@@ -71,5 +85,21 @@ describe Fuey::Client do
                         ]
       }
     }
-  end
+   end
+
+   def one_vpn
+     {
+       "inspections" => {
+         "vpns" => [
+                    {
+                      "name" => "VPN 1",
+                      "ip" =>  "71.131.12.15",
+                      "community" => "public",
+                      "oid" => "1.2.9.2.5.3.5.7.111.0.2.0.1.0",
+                      "version" => "v1"
+                    }
+                   ]
+       }
+     }
+   end
 end

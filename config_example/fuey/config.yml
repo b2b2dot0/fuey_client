@@ -11,9 +11,10 @@ inspections:
       - '0.0.0.0'
   vpns:
     -
-      - 'VPN 1'
-      - '71.1.1.1'
-    -
-      - 'VPN 2'
-      - '9.0.1.2'
+      - 
+        name: 'VPN 1'
+        ip: '71.131.12.15'
+        community: "public"
+        oid: "1.2.9.2.5.3.5.7.111.0.2.0.1.0"
+        version: "v1"
   
