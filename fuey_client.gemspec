@@ -19,8 +19,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "configurethis", ">= 1.0.4"
+  spec.add_dependency "configurethis", ">= 1.0.5"
   spec.add_dependency "net-ping", "~> 1.6"
+  spec.add_dependency "activesupport"
+  spec.add_dependency "activemodel"
   # spec.add_dependency "b2b2dot0-sapnwrfc", "~> 0.26" # https://github.com/piersharding/ruby-sapnwrfc
 
   spec.add_development_dependency "bundler", "~> 1.3"

@@ -1,20 +1,18 @@
 ---
 title: "My app server"
 logfile: /var/log/fuey.log
-inspections:
-  pings:
-    - 
-      - 'Google DNS'
-      - '8.8.8.8'
-    - 
-      - 'Localhost'
-      - '0.0.0.0'
-  vpns:
-    -
-      - 
-        name: 'VPN 1'
-        ip: '71.131.12.15'
-        community: "public"
-        oid: "1.2.9.2.5.3.5.7.111.0.2.0.1.0"
-        version: "v1"
-  
+notifications:
+  -
+    - "run.trace"
+    - "Fuey::Log"
+traces:
+  two_pings:
+  - Ping:
+      name: Google
+      host: 8.8.8.8
+  - SNMPWalk:
+      name: "VPNTunnel"
+      ip: "98.31.121.10"
+      community: "public"
+      oid: "1.1.0.2.0.1.9.4.131.9.2.7.7.1"
+      version: "v1"  

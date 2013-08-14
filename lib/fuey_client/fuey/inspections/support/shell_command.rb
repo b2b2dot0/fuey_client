@@ -7,7 +7,7 @@ module Fuey
         end
 
         def execute
-          %x(#{command})
+          %x(#{@command})
         end
       end
     end
