@@ -27,11 +27,8 @@ module Fuey
         %(SNMPWalk #{state}. #{response})
       end
 
-      def status
-        {
-          :settings => snmp_walk_command,
-          :statusMessage => status_message
-        }.merge(super)
+      def settings
+        snmp_walk_command || ""
       end
 
       def to_s

@@ -16,7 +16,7 @@ describe Fuey::Inspections::RFCPing do
   Given (:rfc_ping) { Fuey::Inspections::RFCPing.new config }
 
   describe "status" do
-    Then { expect( rfc_ping.status[:settings] ).to_not include('passwd') }
+    Then { expect( rfc_ping.status.settings ).to_not include('passwd') }
   end
 
   context "when the ping fails" do

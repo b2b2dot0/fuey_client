@@ -29,11 +29,14 @@ describe Fuey::Inspections::Inspection do
     def expects_notification_of(*states)
       states.each do |state|
         self.should_receive(:update).
-          with({
-                 :type => @inspection.class.to_s,
-                 :name => @inspection.name,
-                 :status => state
-               })
+          with(Fuey::Inspections::Support::Status.new(
+                                                      :type => @inspection.class.to_s,
+                                                      :name => @inspection.name,
+                                                      :status => state,
+                                                      :settings => nil,
+                                                      :status_message => nil
+                                                      )
+               )
       end
     end
   end

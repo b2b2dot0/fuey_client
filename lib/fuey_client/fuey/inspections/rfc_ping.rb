@@ -23,11 +23,8 @@ module Fuey
         %(RFCPing #{state} for #{ashost}.)
       end
 
-      def status
-        {
-          :settings => config.reject{|k,v| k == 'passwd'},
-          :statusMessage => status_message
-        }.merge(super)
+      def settings
+        config.reject{|k,v| k == 'passwd'}
       end
 
       def config

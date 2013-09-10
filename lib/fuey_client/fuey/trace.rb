@@ -3,36 +3,36 @@ require "fuey_client/fuey/reporters"
 require "active_support"
 require "observer"
 
-
 module Fuey
   class Trace
     include ModelInitializer
     include Observable
 
-    attr_accessor :name, :steps
+    attr_accessor :name
 
     def initialize(args)
       super(args)
-      @steps ||= Array.new
     end
 
-    def self.all
-      Config::Fuey.traces.keys.map do |trace_name|
-        trace = Trace.new :name => trace_name
-        Config::Fuey.traces.send(trace_name).each do |step|
-          inspection_class = ActiveSupport::Inflector.constantize %(Fuey::Inspections::#{step.keys.first})
-          inspection = inspection_class.new(step.values.first)
-          inspection.add_observer(trace)
-          inspection.add_observer(error_logger)
-          trace.steps.push inspection
-        end
-        trace
-      end
+    def receiver=(observer)
+      add_observer observer
     end
 
-    def self.error_logger
-      @@error_logger ||= Fuey::Reporters::ErrorLogger.new
+    def add_step(inspection)
+      inspection.add_observer(self)
+      inspection.add_observer(error_logger)
+      steps.push inspection
+      inspection
     end
+
+    def steps
+      @_steps ||= Array.new
+    end
+
+    def error_logger
+      @_error_logger ||= Fuey::Reporters::ErrorLogger.new
+    end
+    private :error_logger
 
     def to_s
       %(#{name}: [#{steps.join(', ')}])
@@ -41,42 +41,40 @@ module Fuey
     # Handle updates from inpsections via observation
     def update(status)
       changed
-      notify_observers(
-                       "fuey.trace.update",
-                       {
-                         :name => name,
-                         :status => status[:status],
-                         :statusMessage => status[:statusMessage],
-                         :steps => [ status ]
-                       })
+      notify_observers :update, name, [status]
+      true
+    end
+
+    def status
+      @_current ? @_current.state : "pending"
+    end
+
+    def status_message
+      @_current.failed? ? @_current.status_message : ""
     end
 
     def run
       changed
-      notify_observers(
-                       "fuey.trace.new",
-                       {
-                         :name => name,
-                         :status => "executed",
-                         :statusMessage => "",
-                         :steps => steps.map(&:status)
-                       }
-                       )
+      notify_observers :new, name, steps.map(&:status)
+
       ActiveSupport::Notifications.instrument("run.trace", {:trace => self.to_s}) do
-        run, failed, current = 0, 0, ""
+        run, failed, @_current = 0, 0, nil
         steps.each do |step|
           run += 1
-          current = step.name
+          @_current = step
           step.execute
           if step.failed?
             failed += 1
             break
           end
         end
+
+        changed
+        notify_observers :complete, self
         if failed == 0
           %(#{name} passed. #{steps.size} steps, #{run} executed, #{failed} failed.)
         else
-          %(#{name} failed on #{current}. #{steps.size} steps, #{run} executed, #{failed} failed.)
+          %(#{name} failed on #{@_current.name}. #{steps.size} steps, #{run} executed, #{failed} failed.)
         end
       end
     end

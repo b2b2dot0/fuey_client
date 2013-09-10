@@ -18,12 +18,14 @@ module Fuey
         %(Ping #{name} #{host})
       end
 
-      def status
-        {
-          :settings => host || "",
-          :statusMessage => %(#{state} ping for #{host}),
-        }.merge(super)
+      def settings
+        host || ""
       end
+
+      def status_message
+        %(#{state} ping for #{host})
+      end
+
     end
   end
 end

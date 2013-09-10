@@ -17,11 +17,11 @@ shared_examples "an inspection" do
 
     describe "and have specific pieces of information" do
       When (:status) { described_class.new({:name => 'descriptive'}).status }
-      Then { expect( status[:type] ).to eql(described_class.to_s.split('::').last) }
-      And  { expect( status[:name] ).to eql('descriptive') }
-      And  { expect( status[:settings] ).to_not be_nil }
-      And  { expect( status[:status] ).to eql("pending") }
-      And  { expect( status[:statusMessage] ).to_not be_nil }
+      Then { expect( status.type ).to eql(described_class.to_s.split('::').last) }
+      And  { expect( status.name ).to eql('descriptive') }
+      And  { expect( status.settings ).to_not be_nil }
+      And  { expect( status.status ).to eql("pending") }
+      And  { expect( status.status_message ).to_not be_nil }
     end
 
   end
